@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'libvirt'
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -25,9 +27,9 @@ Vagrant.configure("2") do |config|
   # config.vm.network "forwarded_port", guest: 80, host: 8080
 
   config.ssh.keep_alive = true
-  config.ssh.insert_key = false
+  config.ssh.insert_key = true
   config.ssh.keys_only = true
-  config.ssh.username = "fedora"
+  config.ssh.username = "root"
   #config.ssh.password = "vagrant"
 
   # Create a forwarded port mapping which allows access to a specific port
@@ -48,10 +50,10 @@ Vagrant.configure("2") do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder "synced_data/", "/home/vagrant/synced_data"
+  config.vm.synced_folder "synced_data/", "/root/synced_data", type: "nfs", nfs_version: 4, nfs_udp: false
 
   Dir.mkdir('.dnf-cache') unless File.exists?('.dnf-cache')
-  config.vm.synced_folder ".dnf-cache", "/var/cache/dnf", type: "sshfs", sshfs_opts_append: "-o nonempty"
+  config.vm.synced_folder ".dnf-cache", "/var/cache/dnf", type: "nfs", nfs_version: 4, nfs_udp: false
 
   # Disable the default share of the current code directory. Doing this
   # provides improved isolation between the vagrant box and your host
@@ -62,11 +64,10 @@ Vagrant.configure("2") do |config|
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
-  config.vm.provider "virtualbox" do |vb|
-    vb.gui = false
-    vb.name = "fedora-40-kata-test-env"
-    vb.cpus = 4
-    vb.memory = "4096"
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.cpus = 4
+    libvirt.memory = "4096"
+    libvirt.nested = true
   end
 
   # View the documentation for the provider you are using for more
@@ -75,14 +76,5 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo dnf upgrade -y
-    sudo dnf install -y gcc make git
-    curl -O "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
-    tar vxf musl-1.2.5.tar.gz
-    cd musl-1.2.5/
-    ./configure --prefix=/usr/local/
-    make && sudo make install
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain 1.72 -t x86_64-unknown-linux-musl -y
-  SHELL
+  config.vm.provision "shell", path: "setup.sh"
 end

@@ -5,19 +5,18 @@ This repository contains an automated test environment that provisions a local V
 ## Requisites
 
 - Install the latest version of [Vagrant](https://developer.hashicorp.com/vagrant/docs/installation);
-- Install a virtualization product such as [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
-
-Vagrant support for `libvirt` is kind of a let down, so I chose `VirtualBox` for this script. In any case, it's easy to modify the `Vagrantfile` to make it use `libvirt` instead.
+- Install the [Fedora virtualization stack](https://docs.fedoraproject.org/en-US/quick-docs/virtualization-getting-started/).
+- Make sure you have the latest versions of `GCC` and `Make`;
+- Install the `vagrant-libvirt` [plugin](https://vagrant-libvirt.github.io/vagrant-libvirt/installation.html#fedora);
+  - Generally it suffices to do `vagrant plugin install vagrant-libvirt`.
 
 ## Usage
 
-Simply do `vagrant up` from the root of this repository. This will provision the VM with all the necessary dependencies. Once that is finished, do `vagrant ssh` from the root of the repository to enter the VM. There will be a `synced_data` folder in the home of the VM that mirrors the `synced_data` folder in this repo. One should clone the specific `kata-containers` fork in question on this folder in order to edit it using the host and compile and test it using the guest.
+Simply do `vagrant up` from the root of this repository. This will provision the VM with all the necessary dependencies. Once that is finished, do `vagrant ssh` from the root of the repository to enter the VM. There will be a `/home/root/synced_data` folder in the VM that mirrors the `synced_data` folder in this repo. One should clone the specific `kata-containers` fork in question on this folder in order to edit it using the host and compile and test it using the guest.
 
-When you're done with your work, do `vagrant halt` from the host or `sudo shutdown now` from the guest to gracefully shutdown the VM. You could also do `vagrant suspend` from the host in order to save the current running state of the VM and resume work faster. In any case, to resume working do `vagrant up`.
+When you're done with your work, do `vagrant halt` from the host or `shutdown now` from the guest to gracefully shutdown the VM. You could also do `vagrant suspend` from the host in order to save the current running state of the VM and resume work faster. In any case, to resume working do `vagrant up`.
 
 If you want to eliminate the VM completely to start over, do `vagrant destroy` from the host.
-
-If when provisioning a VM you get an error from VirtualBox such as "A VirtualBox machine with the name 'fedora-40-kata-test-env' already exists", do `VBoxManage unregistervm fedora-40-kata-test-env --delete-all`.
 
 [Click here](https://developer.hashicorp.com/vagrant/docs/cli) to see a complete documentation of the Vagrant CLI.
 
