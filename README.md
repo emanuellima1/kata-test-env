@@ -25,5 +25,6 @@ Once you have your environment provisioned, simply clone your fork of `kata-cont
 In order to test it, you will need three things:
 
 - A container image, preferably small. I usually use `busybox`. To store it locally for repeated use, do `sudo ctr image pull "docker.io/library/busybox:latest"` on the guest;
-- A `kata-static` tarball. You'll generally get this artifact as the result of a CI run on [Github](https://github.com/kata-containers/kata-containers/actions/);
+- A `kata-static` tarball. You'll generally get this artifact as the result of a CI run of your PR on [Github](https://github.com/kata-containers/kata-containers/actions/);
 - A `configuration-qemu.toml` file. You can use the model on this repo. On that TOML you'll have to declare the location of 3 binaries, `path`, `kernel` and `image` like this model does.
+- A `config.toml` file. You can use the model on this repo. That TOML configures `containerd` to use your recently built Kata. You should copy it to `/etc/containerd/` at the guest after editing it.
